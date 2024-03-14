@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import { Avatar, Box, Button, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material'
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,6 +15,8 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState();
   const [photo, setPhoto] = useState();
 
+  const navigate = useNavigate();
+
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleClickShowConfirmPassword = () => setShowConfirmPassword((show) => !show);
 
@@ -21,16 +24,35 @@ const Register = () => {
     e.preventDefault();
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    const data = {
+
+    const data = new FormData();
+    data.append('file', photo)
+    data.append('upload_preset', "chat-profile")
+    const cloudName = "dawqwxx0p";
+    const resourceType = "image";
+    const api = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
+
+    const res = await axios.post(api, data);
+    const { secure_url } = res.data;
+    const photoURL = secure_url;
+
+    const bodyData = {
       name,
       email,
       password,
-      photo
+      photoURL
     }
-
-    console.log(data);
+    try {
+      if (password !== confirmPassword) {
+        return alert("Passwords do not match");
+      }
+      const response = await axios.post(`http://localhost:8000/api/user/register`, bodyData);
+      navigate('/');
+    } catch (err) {
+      console.log(err.response.data.message);
+    }
   }
   return (
     <Box sx={{
