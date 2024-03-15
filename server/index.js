@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser'
 import morgan from 'morgan'
 import databaseConnection from './db.js'
 import userRoutes from './routes/user.js'
+import chatRoutes from './routes/chat.js'
 
 dotenv.config();
 const app = express()
@@ -21,6 +22,7 @@ databaseConnection();
 
 // API:
 app.use('/api/user', userRoutes);
+app.use('/api/chat', chatRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`)
