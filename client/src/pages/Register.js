@@ -15,6 +15,7 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [phone, setPhone] = useState();
   const [photo, setPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -53,6 +54,7 @@ const Register = () => {
         name,
         email,
         password,
+        phone,
         photoURL
       };
 
@@ -66,7 +68,7 @@ const Register = () => {
       navigate('/');
     } catch (err) {
       setLoading(false);
-      toast.error(err.message);
+      toast.error(err.response.data.message);
     }
   };
 
@@ -136,6 +138,12 @@ const Register = () => {
             label="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+          />
+          <TextField
+            sx={{ width: '100%' }}
+            label="Phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
           />
           <FormControl sx={{ width: '100%' }} variant="outlined">
             <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>

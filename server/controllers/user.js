@@ -33,6 +33,7 @@ export const userLogin = async (req, res, next) => {
                 _id: user.id,
                 name: user.name,
                 email: user.email,
+                phone: user.phone,
                 photo: user.photo
             }
         })
@@ -43,11 +44,11 @@ export const userLogin = async (req, res, next) => {
 
 export const userRegister = async (req, res, next) => {
     try {
-        const { name, email, password, photoURL } = req.body;
-        if (!name || !email || !password || !photoURL) {
+        const { name, email, password, phone, photoURL } = req.body;
+        if (!name || !email || !password || !phone || !photoURL) {
             return next(errorHandler(400, 'Missing fields'));
         }
-        const userExist = await User.findOne({ email });
+        const userExist = await User.findOne({ email, phone });
         if (userExist) {
             return next(errorHandler(400, "User already exists"));
         }
@@ -56,12 +57,32 @@ export const userRegister = async (req, res, next) => {
             name,
             email,
             password: hashedPassword,
+            phone,
             photo: photoURL
         });
 
         res.status(201).json({
             success: true,
             message: 'Register Successfully'
+        })
+    } catch (err) {
+        next(err);
+    }
+}
+
+export const allUsers = async (req, res, next) => {
+    try {
+        const keyword = req.query.search.trim() ? {
+            $or: [
+                { name: { $regex: req.query.search, $options: "i" } },
+                { email: { $regex: req.query.search, $options: "i" } }
+            ]
+        } : {};
+        // const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+        const users = await User.find(keyword);
+
+        res.status(200).json({
+            users
         })
     } catch (err) {
         next(err);

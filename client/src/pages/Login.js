@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
-import { Box, Button, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material'
+import { Box, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material'
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 axios.defaults.withCredentials = true;
 
@@ -37,6 +38,7 @@ const Login = () => {
       toast.success('Login Successfully');
       navigate('/feed');
     } catch (err) {
+      setLoading(false);
       toast.error(err.response.data.message);
     }
   }
@@ -98,14 +100,21 @@ const Login = () => {
               label="Password"
             />
           </FormControl>
-          <Button onClick={handleLogin} variant='contained' sx={{
-            background: '#7269EF',
-            padding: '7px 0px',
-            fontSize: '20px',
-            '&:hover': {
-              background: '#6159CB'
-            }
-          }}>Login</Button>
+          <LoadingButton
+            onClick={handleLogin}
+            loading={loading}
+            variant="contained"
+            sx={{
+              background: '#7269EF',
+              padding: '7px 0px',
+              fontSize: '20px',
+              '&:hover': {
+                background: '#6159CB'
+              }
+            }}
+          >
+            <span>Login</span>
+          </LoadingButton>
         </Box>
         <Typography sx={{
           margin: '20px 0 10px 0',
