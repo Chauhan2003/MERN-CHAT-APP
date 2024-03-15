@@ -100,6 +100,10 @@ export const createGroupChat = async (req, res, next) => {
 export const renameGroupChat = async (req, res, next) => {
     try {
         const { chatId, chatName } = req.body;
+        const admin = await Chat.findOne({ _id: chatId });
+        if (admin.groupAdmin != req.user._id) {
+            return next(errorHandler(400, 'Only the group admin can perform this action'));
+        }
         const updatedChat = await Chat.findByIdAndUpdate(
             chatId,
             {
@@ -127,6 +131,10 @@ export const renameGroupChat = async (req, res, next) => {
 export const removeUserFromGroupChat = async (req, res, next) => {
     try {
         const { chatId, userId } = req.body;
+        const admin = await Chat.findOne({ _id: chatId });
+        if (admin.groupAdmin != req.user._id) {
+            return next(errorHandler(400, 'Only the group admin can perform this action'));
+        }
         const removed = await Chat.findByIdAndUpdate(
             chatId,
             {
@@ -154,6 +162,10 @@ export const removeUserFromGroupChat = async (req, res, next) => {
 export const addMemberToGroupChat = async (req, res, next) => {
     try {
         const { chatId, userId } = req.body;
+        const admin = await Chat.findOne({ _id: chatId });
+        if (admin.groupAdmin != req.user._id) {
+            return next(errorHandler(400, 'Only the group admin can perform this action'));
+        }
         const added = await Chat.findByIdAndUpdate(
             chatId,
             {
