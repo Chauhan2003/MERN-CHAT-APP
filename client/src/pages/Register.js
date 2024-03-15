@@ -1,21 +1,21 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Avatar, Box, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material'
+import { Avatar, Box, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [name, setName] = useState();
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
-  const [confirmPassword, setConfirmPassword] = useState();
-  const [photo, setPhoto] = useState();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [photo, setPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -32,39 +32,44 @@ const Register = () => {
     setLoading(true);
 
     const data = new FormData();
-    data.append('file', photo)
-    data.append('upload_preset', "chat-profile")
+    data.append('file', photo);
+    data.append('upload_preset', "chat-profile");
     const cloudName = "dawqwxx0p";
     const resourceType = "image";
     const api = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
 
     try {
-      const res = await axios.post(api, data);
-      const { secure_url } = res.data;
-      var photoURL = secure_url;
-    } catch (err) {
-      toast.error('Unable To Upload Profile Photo');
-    }
+      const cloudinaryResponse = await fetch(api, {
+        method: 'POST',
+        body: data
+      });
+      const cloudinaryData = await cloudinaryResponse.json();
+      const { secure_url } = cloudinaryData;
+      const photoURL = secure_url;
 
-    const bodyData = {
-      name,
-      email,
-      password,
-      photoURL
-    }
-    try {
+      console.log(photoURL);
+
+      const bodyData = {
+        name,
+        email,
+        password,
+        photoURL
+      };
+
       if (password !== confirmPassword) {
-        return alert("Passwords do not match");
+        throw new Error("Passwords do not match");
       }
-      const response = await axios.post(`http://localhost:8000/api/user/register`, bodyData);
+
+      await axios.post(`http://localhost:8000/api/user/register`, bodyData);
       setLoading(false);
-      toast.success('Register Successfully');
+      toast.success('Registered Successfully');
       navigate('/');
     } catch (err) {
-      setLoading(false)
-      toast.error(err.response.data.message);
+      setLoading(false);
+      toast.error(err.message);
     }
-  }
+  };
+
   return (
     <Box sx={{
       width: '100%',
@@ -123,11 +128,13 @@ const Register = () => {
           <TextField
             sx={{ width: '100%' }}
             label="Name"
+            value={name}
             onChange={(e) => setName(e.target.value)}
           />
           <TextField
             sx={{ width: '100%' }}
             label="Email"
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <FormControl sx={{ width: '100%' }} variant="outlined">
@@ -135,6 +142,7 @@ const Register = () => {
             <OutlinedInput
               id="outlined-adornment-password"
               type={showConfirmPassword ? 'text' : 'password'}
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
               endAdornment={
                 <InputAdornment position="end">
@@ -156,6 +164,7 @@ const Register = () => {
             <OutlinedInput
               id="outlined-adornment-password"
               type={showPassword ? 'text' : 'password'}
+              value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               endAdornment={
                 <InputAdornment position="end">
@@ -172,14 +181,6 @@ const Register = () => {
               label="Confirm Password"
             />
           </FormControl>
-          {/* <Button onClick={handleRegister} disabled={loading} variant='contained' sx={{
-            background: '#7269EF',
-            padding: '7px 0px',
-            fontSize: '20px',
-            '&:hover': {
-              background: '#6159CB'
-            }
-          }}>Register</Button> */}
           <LoadingButton
             onClick={handleRegister}
             loading={loading}
@@ -205,7 +206,7 @@ const Register = () => {
         <Typography>© 2024 Lets Chat. Crafted with by Gagan Chauhan</Typography>
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;
