@@ -123,3 +123,57 @@ export const renameGroupChat = async (req, res, next) => {
         next(err);
     }
 }
+
+export const removeUserFromGroupChat = async (req, res, next) => {
+    try {
+        const { chatId, userId } = req.body;
+        const removed = await Chat.findByIdAndUpdate(
+            chatId,
+            {
+                $pull: { users: userId },
+            },
+            {
+                new: true,
+            }
+        )
+            .populate("users", "-password")
+            .populate("groupAdmin", "-password");
+
+        if (!removed) {
+            return next(errorHandler(400, 'Chat not found!'));
+        }
+
+        res.status(200).json({
+            removed
+        })
+    } catch (err) {
+        next(err);
+    }
+}
+
+export const addMemberToGroupChat = async (req, res, next) => {
+    try {
+        const { chatId, userId } = req.body;
+        const added = await Chat.findByIdAndUpdate(
+            chatId,
+            {
+                $push: { users: userId },
+            },
+            {
+                new: true,
+            }
+        )
+            .populate("users", "-password")
+            .populate("groupAdmin", "-password");
+
+        if (!added) {
+            return next(errorHandler(400, 'Chat not found'));
+        }
+
+        res.status(200).json({
+            added
+        })
+    } catch (err) {
+        next(err);
+    }
+}
