@@ -72,7 +72,7 @@ export const userRegister = async (req, res, next) => {
 
 export const allUsers = async (req, res, next) => {
     try {
-        const keyword = req.query.search.trim() ? {
+        const keyword = req.query.search ? {
             $or: [
                 { name: { $regex: req.query.search, $options: "i" } },
                 { email: { $regex: req.query.search, $options: "i" } }
