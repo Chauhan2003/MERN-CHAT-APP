@@ -21,9 +21,11 @@ export const userLogin = async (req, res, next) => {
             _id: user._id
         });
 
-        res.cookie('token', token, {
+        res.cookie('letsChatToken', token, {
             httpOnly: true,
-            maxAge: 604800000 // 7 Days
+            maxAge: 604800000, // 7 Days
+            sameSite: 'none',
+            secure: true
         }).status(201).json({
             success: true,
             message: 'Login Successfully',

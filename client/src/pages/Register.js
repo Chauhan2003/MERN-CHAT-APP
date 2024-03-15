@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
-import { Avatar, Box, Button, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material'
+import LoadingButton from '@mui/lab/LoadingButton';
+import { Avatar, Box, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material'
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,6 +16,7 @@ const Register = () => {
   const [password, setPassword] = useState();
   const [confirmPassword, setConfirmPassword] = useState();
   const [photo, setPhoto] = useState();
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -26,6 +29,7 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const data = new FormData();
     data.append('file', photo)
@@ -34,9 +38,13 @@ const Register = () => {
     const resourceType = "image";
     const api = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
 
-    const res = await axios.post(api, data);
-    const { secure_url } = res.data;
-    const photoURL = secure_url;
+    try {
+      const res = await axios.post(api, data);
+      const { secure_url } = res.data;
+      var photoURL = secure_url;
+    } catch (err) {
+      toast.error('Unable To Upload Profile Photo');
+    }
 
     const bodyData = {
       name,
@@ -49,9 +57,12 @@ const Register = () => {
         return alert("Passwords do not match");
       }
       const response = await axios.post(`http://localhost:8000/api/user/register`, bodyData);
+      setLoading(false);
+      toast.success('Register Successfully');
       navigate('/');
     } catch (err) {
-      console.log(err.response.data.message);
+      setLoading(false)
+      toast.error(err.response.data.message);
     }
   }
   return (
@@ -161,14 +172,29 @@ const Register = () => {
               label="Confirm Password"
             />
           </FormControl>
-          <Button onClick={handleRegister} variant='contained' sx={{
+          {/* <Button onClick={handleRegister} disabled={loading} variant='contained' sx={{
             background: '#7269EF',
             padding: '7px 0px',
             fontSize: '20px',
             '&:hover': {
               background: '#6159CB'
             }
-          }}>Register</Button>
+          }}>Register</Button> */}
+          <LoadingButton
+            onClick={handleRegister}
+            loading={loading}
+            variant="contained"
+            sx={{
+              background: '#7269EF',
+              padding: '7px 0px',
+              fontSize: '20px',
+              '&:hover': {
+                background: '#6159CB'
+              }
+            }}
+          >
+            <span>Register</span>
+          </LoadingButton>
         </Box>
         <Typography sx={{
           margin: '20px 0 10px 0',

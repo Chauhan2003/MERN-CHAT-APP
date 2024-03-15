@@ -2,12 +2,19 @@ import React, { useState } from 'react'
 import { Box, Button, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material'
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import axios from 'axios';
+
+axios.defaults.withCredentials = true;
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -15,14 +22,23 @@ const Login = () => {
     e.preventDefault();
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     const data = {
       email,
       password
     }
 
-    console.log(data);
+    try {
+      const res = await axios.post(`http://localhost:8000/api/user/login`, data);
+      setLoading(false);
+      toast.success('Login Successfully');
+      navigate('/feed');
+    } catch (err) {
+      toast.error(err.response.data.message);
+    }
   }
   return (
     <Box sx={{
