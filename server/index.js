@@ -1,6 +1,7 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 import morgan from 'morgan'
 import databaseConnection from './db.js'
 import userRoutes from './routes/user.js'
@@ -13,6 +14,7 @@ const PORT = process.env.PORT || 8080
 app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 app.use(express.json());
 app.use(morgan('dev'));
+app.use(cookieParser());
 
 // MongoDB Connection:
 databaseConnection();

@@ -1,7 +1,7 @@
 import User from '../models/user.js';
 import errorHandler from '../utils/error.js';
 import { comparePassword, hashPassword } from '../utils/password.js';
-import { generateToken } from '../utils/token.js';
+import generateToken from '../utils/token.js';
 
 export const userLogin = async (req, res, next) => {
     try {
@@ -78,8 +78,7 @@ export const allUsers = async (req, res, next) => {
                 { email: { $regex: req.query.search, $options: "i" } }
             ]
         } : {};
-        // const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
-        const users = await User.find(keyword);
+        const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
 
         res.status(200).json({
             users
