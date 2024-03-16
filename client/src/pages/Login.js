@@ -6,8 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
-
-axios.defaults.withCredentials = true;
+import { ChatState } from '../context/ChatProvider';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,6 +15,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const { setUser } = ChatState();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -33,7 +33,8 @@ const Login = () => {
     }
 
     try {
-      await axios.post(`http://localhost:8000/api/user/login`, data);
+      const res = await axios.post(`http://localhost:8000/api/user/login`, data);
+      setUser(res.data.user);
       setLoading(false);
       toast.success('Login Successfully');
       navigate('/feed');

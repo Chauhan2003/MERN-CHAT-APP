@@ -144,3 +144,15 @@ export const allUsers = async (req, res, next) => {
         next(err);
     }
 }
+
+export const checkCookies = async (req, res, next) => {
+    try {
+        const user = await User.find({ _id: req.user._id });
+        res.status(200).json({
+            success: true,
+            user
+        })
+    } catch (err) {
+        next(err);
+    }
+}

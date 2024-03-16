@@ -1,5 +1,5 @@
 import express from 'express';
-import { allUsers, forgetPassword, resetPassword, userLogin, userRegister } from '../controllers/user.js';
+import { allUsers, checkCookies, forgetPassword, resetPassword, userLogin, userRegister } from '../controllers/user.js';
 import { isAuth } from '../middlewares/isAuth.js';
 const router = express.Router();
 
@@ -8,5 +8,6 @@ router.route('/register').post(userRegister);
 router.route('/forgetpassword').post(forgetPassword);
 router.route('/resetpassword/:id/:token').put(resetPassword);
 router.route('/').get(isAuth, allUsers);
+router.route('/checkcookie').get(isAuth, checkCookies);
 
 export default router;
