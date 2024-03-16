@@ -211,7 +211,7 @@ const Register = () => {
         }}>Already have Account? <Link style={{
           color: '#6159CB'
         }} to='/'>Login</Link></Typography>
-        <Typography>© 2024 Lets Chat. Crafted with by Gagan Chauhan</Typography>
+        <Typography>© 2024 LetsChat. Crafted with by Gagan Chauhan</Typography>
       </Box>
     </Box>
   );

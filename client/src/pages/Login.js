@@ -42,6 +42,20 @@ const Login = () => {
       toast.error(err.response.data.message);
     }
   }
+
+  const handleForgetPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      await axios.post('http://localhost:8000/api/user/forgetpassword', { email: email });
+      setLoading(false);
+      toast.success('Check your Email to Reset Password');
+    } catch (err) {
+      setLoading(false);
+      toast.error(err.response.data.message);
+    }
+  }
   return (
     <Box sx={{
       width: '100%',
@@ -115,6 +129,12 @@ const Login = () => {
           >
             <span>Login</span>
           </LoadingButton>
+          <Typography onClick={handleForgetPassword} fontSize={16} color={'#6159CB'} sx={{
+            '&:hover': {
+              textDecoration: 'underline',
+              cursor: 'pointer'
+            }
+          }}>Forget Password</Typography>
         </Box>
         <Typography sx={{
           margin: '20px 0 10px 0',
@@ -122,7 +142,7 @@ const Login = () => {
         }}>Don't have Account? <Link style={{
           color: '#6159CB'
         }} to='/register'>Register</Link></Typography>
-        <Typography>© 2024 Lets   Chat. Crafted with by Gagan Chauhan</Typography>
+        <Typography>© 2024 LetsChat. Crafted with by Gagan Chauhan</Typography>
       </Box>
     </Box>
   )
