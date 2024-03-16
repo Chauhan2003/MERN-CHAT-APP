@@ -145,6 +145,16 @@ export const allUsers = async (req, res, next) => {
     }
 }
 
+export const logOutUser = async (req, res, next) => {
+    try {
+        res.clearCookie('letsChatToken');
+        res.status(200).send('Logout successfully');
+    } catch (err) {
+        next(err);
+    }
+}
+
+
 export const checkCookies = async (req, res, next) => {
     try {
         const user = await User.find({ _id: req.user._id });

@@ -1,10 +1,39 @@
-import { Avatar, Box, IconButton } from '@mui/material'
+import { Avatar, Box, IconButton, Menu, MenuItem, Typography } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import SettingsIcon from '@mui/icons-material/Settings';
-import React from 'react'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify';
+import axios from 'axios';
+import { ChatState } from '../../context/ChatProvider';
+
+axios.defaults.withCredentials = true;
 
 const Header = () => {
+    const [open, SetOpen] = useState(false);
+
+    const navigate = useNavigate()
+    const { setUser } = ChatState();
+
+    const handleClick = (e) => {
+        SetOpen(e.currentTarget);
+    };
+    const handleClose = () => {
+        SetOpen(false);
+    };
+
+    const handleLogOut = async (e) => {
+        e.preventDefault();
+
+        try {
+            await axios.get('http://localhost:8000/api/user/logout');
+            setUser(null);
+            navigate('/');
+        } catch (err) {
+            toast.error(err.response.data.message);
+        }
+    }
     return (
         <Box sx={{
             width: '100%',
@@ -34,14 +63,33 @@ const Header = () => {
                         color: 'black'
                     }} />
                 </IconButton>
-                <IconButton>
+                <IconButton onClick={handleClick}>
                     <SettingsIcon sx={{
                         fontSize: '25px',
                         color: 'black'
                     }} />
                 </IconButton>
             </Box>
-        </Box>
+            <Menu
+                anchorEl={open}
+                keepMounted
+                open={open}
+                onClose={handleClose}
+                getContentAnchorE1={null}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right'
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right'
+                }}
+            >
+                <MenuItem sx={{
+                    paddingInline: '20px'
+                }} onClick={handleClose}><Typography onClick={handleLogOut}>Logout</Typography></MenuItem>
+            </Menu>
+        </Box >
     )
 }
 
