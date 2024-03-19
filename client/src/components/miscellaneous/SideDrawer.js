@@ -1,27 +1,51 @@
-import { Avatar, Box, Button, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useState } from 'react';
+import { Avatar, Box, Button, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { ChatState } from '../../context/ChatProvider';
+import ProfileDialog from './ProfileDialog';
+import { toast } from 'react-toastify';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+axios.defaults.withCredentials = true;
 
 const SideDrawer = () => {
-    const [search, setSearch] = useState("")
-    const [searchResult, setSearchResult] = useState([])
-    const [loading, setLoding] = useState(false)
-    const [loadingChat, setLoadingChat] = useState();
+    const [anchorElNotification, setAnchorElNotification] = useState(null);
+    const [anchorElAvatar, setAnchorElAvatar] = useState(null);
+    const { user, setUser } = ChatState();
+    const navigate = useNavigate();
 
-    const [anchorEl, setAnchorEl] = useState(null);
-    const open = Boolean(anchorEl);
-
-    const { user } = ChatState();
-
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
+    const handleClickNotification = (event) => {
+        setAnchorElNotification(event.currentTarget);
     };
 
-    const handleClose = () => {
-        setAnchorEl(null);
+    const handleClickAvatar = (event) => {
+        setAnchorElAvatar(event.currentTarget);
     };
+
+    const handleCloseNotification = () => {
+        setAnchorElNotification(null);
+    };
+
+    const handleCloseAvatar = () => {
+        setAnchorElAvatar(null);
+    };
+
+    const handleLogout = async (e) => {
+        e.preventDefault();
+        setAnchorElAvatar(null);
+
+        try {
+            await axios.get(`http://localhost:8000/api/user/logout`);
+            setUser(null);
+            navigate('/');
+            toast.success('Logout Successfully');
+        } catch (err) {
+            toast.error(err.response.data.message);
+        }
+    };
+
     return (
         <Box sx={{
             display: 'flex',
@@ -59,14 +83,14 @@ const SideDrawer = () => {
             <Box sx={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px'
+                gap: '20px'
             }}>
                 <Box>
                     <IconButton
-                        aria-controls={open ? 'basic-menu' : undefined}
+                        aria-controls={anchorElNotification ? 'notification-menu' : undefined}
                         aria-haspopup="true"
-                        aria-expanded={open ? 'true' : undefined}
-                        onClick={handleClick}
+                        aria-expanded={anchorElNotification ? 'true' : undefined}
+                        onClick={handleClickNotification}
                     >
                         <NotificationsIcon sx={{
                             color: 'white',
@@ -74,42 +98,41 @@ const SideDrawer = () => {
                         }} />
                     </IconButton>
                     <Menu
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleClose}
-                        MenuListProps={{
-                            'aria-labelledby': 'basic-button',
-                        }}>
-                        {/* <MenuItem onClick={handleClose}>Profile</MenuItem>
-                    <MenuItem onClick={handleClose}>My account</MenuItem>
-                    <MenuItem onClick={handleClose}>Logout</MenuItem> */}
+                        id="notification-menu"
+                        anchorEl={anchorElNotification}
+                        open={Boolean(anchorElNotification)}
+                        onClose={handleCloseNotification}
+                    >
+                        {/* Add your notification menu items here */}
                     </Menu>
                 </Box>
                 <Box>
                     <Avatar
-                        aria-controls={open ? 'basic-menu' : undefined}
+                        aria-controls={anchorElAvatar ? 'avatar-menu' : undefined}
                         aria-haspopup="true"
-                        aria-expanded={open ? 'true' : undefined}
-                        onClick={handleClick}
+                        aria-expanded={anchorElAvatar ? 'true' : undefined}
+                        onClick={handleClickAvatar}
                         src={user.photo}
                         sx={{
                             cursor: 'pointer'
-                        }} />
+                        }}
+                    />
                     <Menu
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleClose}
-                        MenuListProps={{
-                            'aria-labelledby': 'basic-button',
-                        }}>
-                        <MenuItem onClick={handleClose}>Profile</MenuItem>
-                        <MenuItem onClick={handleClose}>My account</MenuItem>
-                        <MenuItem onClick={handleClose}>Logout</MenuItem>
+                        id="avatar-menu"
+                        anchorEl={anchorElAvatar}
+                        open={Boolean(anchorElAvatar)}
+                        onClose={handleCloseAvatar}
+                    >
+                        <ProfileDialog user={user}>
+                            <MenuItem>Profile</MenuItem>
+                        </ProfileDialog>
+                        <MenuItem onClick={handleCloseAvatar}>My account</MenuItem>
+                        <MenuItem onClick={handleLogout}>Logout</MenuItem>
                     </Menu>
                 </Box>
             </Box>
-        </Box >
-    )
-}
+        </Box>
+    );
+};
 
-export default SideDrawer
+export default SideDrawer;
